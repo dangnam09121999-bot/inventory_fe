@@ -1,0 +1,158 @@
+/* Sidebar Collapsible on Hover */
+.sidebar {
+  width: 60px !important;
+  background: #2c3e50 !important;
+  border-right: 1px solid #1a252f !important;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar:hover {
+  width: 240px !important;
+}
+
+.sidebar li {
+  margin-bottom: 4px !important;
+}
+
+.sidebar a {
+  display: flex !important;
+  align-items: center !important;
+  padding: 14px 20px !important;
+  color: #ecf0f1 !important;
+  border-left: 4px solid transparent !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+  gap: 12px !important;
+}
+
+.sidebar a::before {
+  content: '📦';
+  font-size: 20px;
+  min-width: 20px;
+}
+
+.sidebar li:nth-child(2) a::before {
+  content: '📥';
+}
+
+.sidebar li:nth-child(3) a::before {
+  content: '📤';
+}
+
+.sidebar li.active a {
+  background: #34495e !important;
+  border-left: 4px solid #3498db !important;
+  color: #fff !important;
+}
+
+.sidebar a:hover {
+  background: #34495e !important;
+  border-left: 4px solid #3498db !important;
+  color: #fff !important;
+}
+
+/* Button Improvements */
+button {
+  background: #3498db;
+  color: white;
+  border: 1px solid #2980b9;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+button:hover:not(:disabled) {
+  background: #2980b9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ghost-btn {
+  background: #ecf0f1 !important;
+  color: #2c3e50 !important;
+  border-color: #bdc3c7 !important;
+}
+
+.ghost-btn:hover:not(:disabled) {
+  background: #bdc3c7 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.secondary-btn {
+  background: #16a34a !important;
+  border-color: #15803d !important;
+}
+
+.secondary-btn:hover:not(:disabled) {
+  background: #15803d !important;
+  box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3) !important;
+}
+
+.danger-btn {
+  background: #dc2626 !important;
+  border-color: #b91c1c !important;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: #b91c1c !important;
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Success Modal Styling */
+.success-header {
+  margin-bottom: 16px;
+}
+
+.success-header h2 {
+  margin: 0;
+  color: #16a34a;
+  font-size: 24px;
+}
+
+.success-card {
+  background: #f0fdf4;
+  border: 2px solid #16a34a;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.success-item-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #15803d;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #bbf7d0;
+}
+
+.success-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.success-row span {
+  color: #166534;
+  min-width: 100px;
+}
+
+.success-row strong {
+  color: #15803d;
+  font-size: 17px;
+}
