@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-const getAuthHeaders = (): HeadersInit => {
+const getAuthHeaders = (): HeadersInit | undefined => {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : undefined;
 };
