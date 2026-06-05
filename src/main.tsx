@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import './sidebar-override.css'
 import './date-input.css'
+import './responsive.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

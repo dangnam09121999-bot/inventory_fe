@@ -4,9 +4,9 @@ import * as XLSX from 'xlsx';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-const getAuthHeaders = (): HeadersInit | undefined => {
+const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : undefined;
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 const formatDate = (value: string | null | undefined) => {
@@ -71,6 +71,7 @@ type ImportRecord = {
   receivedAt: string;
   notes?: string;
   createdAt: string;
+  performedBy?: string;
 };
 
 type ColumnDef = {
@@ -92,10 +93,11 @@ const ALL_COLUMNS: ColumnDef[] = [
   { key: 'company', label: 'Công ty', value: (r) => r.company || '' },
   { key: 'manufacturer', label: 'Nhà SX', value: (r) => r.manufacturer || '' },
   { key: 'country', label: 'Nước SX', value: (r) => r.country || '' },
+  { key: 'performedBy', label: 'Người nhập', value: (r) => r.performedBy || '' },
   { key: 'notes', label: 'Ghi chú', value: (r) => r.notes || '' },
 ];
 
-const DEFAULT_VISIBLE = new Set(['id', 'itemName', 'lotCode', 'quantity', 'expiredAt', 'receivedAt', 'company', 'manufacturer', 'notes']);
+const DEFAULT_VISIBLE = new Set(['id', 'itemName', 'lotCode', 'quantity', 'expiredAt', 'receivedAt', 'company', 'manufacturer', 'performedBy', 'notes']);
 
 type GroupedData = {
   [itemName: string]: ImportRecord[];

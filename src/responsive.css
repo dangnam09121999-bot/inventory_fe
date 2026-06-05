@@ -1,0 +1,164 @@
+/* === Global mobile responsive overrides === */
+
+/* Make tables horizontally scrollable on small screens */
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all images / media never overflow */
+img, video, canvas { max-width: 100%; height: auto; }
+
+/* Tablet & below */
+@media (max-width: 900px) {
+  .inventory-app {
+    padding: 18px 12px 96px; /* leave room for bottom nav */
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .header-right {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-actions button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .item-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-card {
+    width: 96vw !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Sidebar -> bottom navigation on mobile */
+  .sidebar,
+  .sidebar:hover {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 64px !important;
+    padding: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid #1a252f !important;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.18) !important;
+    z-index: 30;
+    overflow: visible !important;
+  }
+
+  .sidebar ul {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: stretch !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .sidebar li {
+    flex: 1 1 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+  }
+
+  .sidebar a {
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 6px 4px !important;
+    font-size: 11px !important;
+    text-align: center !important;
+    border-left: none !important;
+    border-top: 3px solid transparent !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  .sidebar a::before {
+    font-size: 20px !important;
+    min-width: 0 !important;
+  }
+
+  .sidebar li.active a,
+  .sidebar a:hover {
+    border-left: none !important;
+    border-top: 3px solid #3498db !important;
+  }
+
+  .main-content {
+    padding-bottom: 64px;
+  }
+}
+
+/* Phone */
+@media (max-width: 600px) {
+  .inventory-app {
+    padding: 14px 10px 88px;
+  }
+
+  .card strong { font-size: 22px; }
+  .card h2 { font-size: 12px; }
+
+  .overview-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
+  }
+
+  th, td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+
+  table { min-width: 720px; }
+
+  .modal-card {
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+
+  h1 { font-size: 1.5rem; }
+
+  .eyebrow { font-size: 11px; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .sidebar a { font-size: 10px !important; }
+  .overview-grid { grid-template-columns: 1fr !important; }
+}

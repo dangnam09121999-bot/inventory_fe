@@ -15,6 +15,9 @@ import {
 import Login from './Login'
 import ImportHistory from './ImportHistory'
 import ExportHistory from './ExportHistory'
+import Users, { RoleBadge } from './Users'
+import ChangePasswordModal from './ChangePassword'
+import { clearAuth, getStoredToken, getStoredUser, type AuthUserInfo, type UserRole } from './auth'
 
 type InventoryItem = {
   id: number;
@@ -90,8 +93,6 @@ const emptyItemForm = {
   quantity: '',
 }
 
-const getStoredToken = () => localStorage.getItem('token')
-
 const getAuthHeaders = () => {
   const token = getStoredToken()
   return token ? { Authorization: `Bearer ${token}` } : null
@@ -146,7 +147,8 @@ function DateInput({
   )
 }
 
-function InventoryPage({ onLogout }: { onLogout: () => void }) {
+function InventoryPage({ onLogout, role }: { onLogout: () => void; role: UserRole | null }) {
+  const isViewer = role === 'viewer';
   const [items, setItems] = useState<InventoryItem[]>([])
   const [overview, setOverview] = useState<Overview | null>(null)
   const [loading, setLoading] = useState(true)
@@ -518,16 +520,20 @@ ${InventoryDetailsFieldLabel.expiredAt}: ${formatDate(successInfo.expiredAt)}`
               <h2>Tổng Số Lượng</h2>
               <strong>{overview.totalQuantity}</strong>
             </article> */}
-            <article className="card clickable-card" onClick={() => void fetchExpiringItems()} style={{ cursor: 'pointer' }}>
-              <h2>Mặt Hàng Sắp Hết Hạn &le; 30 ngày</h2>
-              <strong>{overview.expiringSoonLots}</strong>
-              <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Nhấn để xem chi tiết</p>
-            </article>
-            <article className="card clickable-card" onClick={() => void fetchExpiredItems()} style={{ cursor: 'pointer' }}>
-              <h2>Mặt Hàng Đã Hết Hạn</h2>
-              <strong>{overview.expiredLots}</strong>
-              <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Nhấn để xem chi tiết</p>
-            </article>
+            {!isViewer && (
+              <>
+                <article className="card clickable-card" onClick={() => void fetchExpiringItems()} style={{ cursor: 'pointer' }}>
+                  <h2>Mặt Hàng Sắp Hết Hạn &le; 30 ngày</h2>
+                  <strong>{overview.expiringSoonLots}</strong>
+                  <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Nhấn để xem chi tiết</p>
+                </article>
+                <article className="card clickable-card" onClick={() => void fetchExpiredItems()} style={{ cursor: 'pointer' }}>
+                  <h2>Mặt Hàng Đã Hết Hạn</h2>
+                  <strong>{overview.expiredLots}</strong>
+                  <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Nhấn để xem chi tiết</p>
+                </article>
+              </>
+            )}
           </section>
         )}
 
@@ -543,24 +549,28 @@ ${InventoryDetailsFieldLabel.expiredAt}: ${formatDate(successInfo.expiredAt)}`
               />
             </div>
             <div className="toolbar-actions">
-              <button type="button" className="secondary-btn" onClick={() => {
-                const aoa: (string | number)[][] = [
-                  ['Thông tin tồn kho'],
-                  [],
-                  ['ID', 'Tên mặt hàng', 'Mã BV', 'CAS', 'Đơn vị', 'Số lượng'],
-                  ...items.map((it) => [it.id, it.name, it.hospitalId, it.cas, it.unit, it.quantity]),
-                ]
-                const ws = XLSX.utils.aoa_to_sheet(aoa)
-                ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }]
-                const wb = XLSX.utils.book_new()
-                XLSX.utils.book_append_sheet(wb, ws, 'Tồn kho')
-                XLSX.writeFile(wb, `ton-kho-${new Date().toISOString().split('T')[0]}.xlsx`)
-              }}>
-                📥 Export Excel
-              </button>
-              <button type="button" onClick={openCreateModal}>
-                Thêm mặt hàng mới
-              </button>
+              {!isViewer && (
+                <button type="button" className="secondary-btn" onClick={() => {
+                  const aoa: (string | number)[][] = [
+                    ['Thông tin tồn kho'],
+                    [],
+                    ['ID', 'Tên mặt hàng', 'Mã BV', 'CAS', 'Đơn vị', 'Số lượng'],
+                    ...items.map((it) => [it.id, it.name, it.hospitalId, it.cas, it.unit, it.quantity]),
+                  ]
+                  const ws = XLSX.utils.aoa_to_sheet(aoa)
+                  ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }]
+                  const wb = XLSX.utils.book_new()
+                  XLSX.utils.book_append_sheet(wb, ws, 'Tồn kho')
+                  XLSX.writeFile(wb, `ton-kho-${new Date().toISOString().split('T')[0]}.xlsx`)
+                }}>
+                  📥 Export Excel
+                </button>
+              )}
+              {!isViewer && (
+                <button type="button" onClick={openCreateModal}>
+                  Thêm mặt hàng mới
+                </button>
+              )}
             </div>
           </div>
         </section>
@@ -602,13 +612,13 @@ ${InventoryDetailsFieldLabel.expiredAt}: ${formatDate(successInfo.expiredAt)}`
                       {InventoryFieldLabel.quantity} <span className="sort-indicator">{getSortMarker('quantity')}</span>
                     </button>
                   </th>
-                  <th>{Action}</th>
+                  {!isViewer && <th>{Action}</th>}
                 </tr>
               </thead>
               <tbody>
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="center muted">
+                    <td colSpan={isViewer ? 6 : 7} className="center muted">
                       Khong co mat hang nao
                     </td>
                   </tr>
@@ -667,6 +677,7 @@ ${InventoryDetailsFieldLabel.expiredAt}: ${formatDate(successInfo.expiredAt)}`
                           )}
                         </td>
                         <td>{item.quantity}</td>
+                        {!isViewer && (
                         <td className="action-cell">
                           {isEditing ? (
                             <>
@@ -706,6 +717,7 @@ ${InventoryDetailsFieldLabel.expiredAt}: ${formatDate(successInfo.expiredAt)}`
                             </>
                           )}
                         </td>
+                        )}
                       </tr>
                     )
                   })
@@ -1907,13 +1919,15 @@ function InventoryDetailPage({ onLogout }: { onLogout: () => void }) {
   )
 }
 
-function Sidebar() {
+function Sidebar({ role, onChangePassword }: { role: UserRole | null; onChangePassword: () => void }) {
   const location = useLocation();
-  const links = [
-    { to: '/inventory', label: 'Tồn kho' },
-    { to: '/import-history', label: 'Lịch sử nhập kho' },
-    { to: '/export-history', label: 'Lịch sử xuất kho' },
+  const allLinks: { to: string; label: string; roles: UserRole[] }[] = [
+    { to: '/inventory', label: 'Tồn kho', roles: ['warehouse', 'viewer'] },
+    { to: '/import-history', label: 'Lịch sử nhập kho', roles: ['warehouse'] },
+    { to: '/export-history', label: 'Lịch sử xuất kho', roles: ['warehouse'] },
+    { to: '/users', label: 'Quản lý người dùng', roles: ['warehouse'] },
   ];
+  const links = role ? allLinks.filter((l) => l.roles.includes(role)) : [];
   return (
     <nav className="sidebar">
       <ul>
@@ -1923,16 +1937,36 @@ function Sidebar() {
           </li>
         ))}
       </ul>
+      <div style={{ padding: '12px', borderTop: '1px solid #e0e0e0', marginTop: 'auto' }}>
+        <RoleBadge />
+        <button
+          type="button"
+          onClick={onChangePassword}
+          style={{
+            marginTop: 8,
+            width: '100%',
+            background: 'transparent',
+            border: '1px solid #ccc',
+            padding: '6px 10px',
+            cursor: 'pointer',
+            borderRadius: 4,
+            fontSize: 13,
+          }}
+        >
+          🔒 Đổi mật khẩu
+        </button>
+      </div>
     </nav>
   );
 }
 
 function App() {
-  const [token, setToken] = useState<string | null>(getStoredToken)
+  const [user, setUser] = useState<AuthUserInfo | null>(getStoredUser)
+  const [showChangePassword, setShowChangePassword] = useState(false)
 
   useEffect(() => {
     const syncAuthState = () => {
-      setToken(getStoredToken())
+      setUser(getStoredUser())
     }
     window.addEventListener('storage', syncAuthState)
     window.addEventListener('focus', syncAuthState)
@@ -1942,22 +1976,31 @@ function App() {
     }
   }, [])
 
-  const onLoginSuccess = (nextToken: string) => {
-    localStorage.setItem('token', nextToken)
-    setToken(nextToken)
+  const onLoginSuccess = (nextUser: AuthUserInfo) => {
+    setUser(nextUser)
   }
 
   const onLogout = () => {
-    localStorage.removeItem('token')
-    setToken(null)
+    clearAuth()
+    setUser(null)
   }
 
-  const isAuthenticated = Boolean(token)
+  const isAuthenticated = Boolean(user)
+  const role: UserRole | null = user?.role ?? null
+  const isWarehouse = role === 'warehouse'
+
+  const requireWarehouse = (element: React.ReactNode) => {
+    if (!isAuthenticated) return <Navigate to="/login" replace />
+    if (!isWarehouse) return <Navigate to="/inventory" replace />
+    return <>{element}</>
+  }
 
   return (
     <Router>
       <div className="layout">
-        {isAuthenticated && <Sidebar />}
+        {isAuthenticated && (
+          <Sidebar role={role} onChangePassword={() => setShowChangePassword(true)} />
+        )}
         <div className="main-content">
           <Routes>
             <Route
@@ -1977,26 +2020,29 @@ function App() {
             <Route
               path="/inventory"
               element={
-                isAuthenticated ? <InventoryPage onLogout={onLogout} /> : <Navigate to="/login" replace />
+                isAuthenticated ? <InventoryPage onLogout={onLogout} role={role} /> : <Navigate to="/login" replace />
               }
             />
             <Route
               path="/import-history"
-              element={isAuthenticated ? <ImportHistory /> : <Navigate to="/login" replace />}
+              element={requireWarehouse(<ImportHistory />)}
             />
             <Route
               path="/export-history"
-              element={isAuthenticated ? <ExportHistory /> : <Navigate to="/login" replace />}
+              element={requireWarehouse(<ExportHistory />)}
+            />
+            <Route
+              path="/users"
+              element={requireWarehouse(<Users />)}
             />
             <Route
               path="/inventory/:id/details"
-              element={
-                isAuthenticated ? <InventoryDetailPage onLogout={onLogout} /> : <Navigate to="/login" replace />
-              }
+              element={requireWarehouse(<InventoryDetailPage onLogout={onLogout} />)}
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
+        <ChangePasswordModal open={showChangePassword} onClose={() => setShowChangePassword(false)} />
       </div>
     </Router>
   )
